@@ -1,28 +1,25 @@
 const {
  Client, AccountCreateTransaction, AccountBalanceQuery,
- PrivateKey, Hbar, TransferTransaction
+ PrivateKey, Hbar, TransferTransaction,
 } = require('@hashgraph/sdk')
 const { config } = require('dotenv');
 
 config();
 
-const envs = {
-    accountId: process.env.HEDERA_ACCOUNT_ID,
-    privateKey: process.env.HEDERA_PRIVATE_KEY
-}
-
 const parseEnv = () => {
-    if (!envs.accountId) {
+
+    if (!process.env.HEDERA_ACCOUNT_ID) {
         throw new Error('missing HEDERA_ACCOUNT_ID')
     }
 
-    envs.accountId = envs.accountId.trim()
-
-    if (!envs.privateKey) {
+    if (!process.env.HEDERA_PRIVATE_KEY) {
         throw new Error('missing HEDERA_PRIVATE_KEY')
     }
 
-    envs.privateKey = envs.privateKey.trim()
+    return {
+        accountId: process.env.HEDERA_ACCOUNT_ID.trim(),
+        privateKey: process.env.HEDERA_PRIVATE_KEY.trim(),
+    }
 }
 
 const createAccountId = async (client) => {
@@ -75,7 +72,7 @@ const getQueryCost = async (client, accountId) => {
 }
 
 async function main() {
-    parseEnv(envs)
+    const envs = parseEnv()
 
     const client = Client.forTestnet()
     client.setOperator(envs.accountId, envs.privateKey)
@@ -95,7 +92,7 @@ async function main() {
     console.log('The cost of query is: ', queryCost)
 
     const newBalance = await getAccountBalance(client, newAccountId)
-    console.log('balance: ', newBalance, " tinybars")
+    console.log('balance: ', newBalance, " Tinybars")
 }
 
 main()
